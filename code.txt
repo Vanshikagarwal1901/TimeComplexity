@@ -33,6 +33,19 @@ void quicksort(vector<int>& arr, int low, int high, int& comparisons, int& swaps
     }
 }
 
+void selectionSort(vector<int>& arr){
+    int n = arr.size();
+    for (int i = 0; i < n-1; i++) {
+        int min_idx = i;
+        for (int j = i+1; j < n; j++) {
+            if(a[j]<a[min_idx]){
+                min_idx = j;
+            }
+        }
+        swap(arr[i], arr[min_idx]);
+    }
+}
+
 int main(){
     srand(time(0)); // Seed for random number generation
     int t;
