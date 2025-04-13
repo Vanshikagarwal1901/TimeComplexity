@@ -24,21 +24,23 @@ function First()
     <div style={{ textAlign: 'center' }}>
       <h2
         style={{
-          fontFamily: 'cursive',
-          fontWeight: 'lighter',
-          color: '#2c4453',
+          fontFamily: 'heyyy',
+          fontStyle:'bold',
+          fontSize:'55px',
+          color: '#153243',
           marginBottom: '0',
         }}
         >
-        time complexity
+        Time Complexity
         </h2>
         <h1
         style={{
-          fontSize: '64px',
+          fontSize: '100px',
           fontWeight: 'bold',
-          color: '#2c4453',
+          fontFamily:'helvetica',
+          color: '#153243',
           letterSpacing: '2px',
-          marginTop: '0',
+          marginTop: '-50px',
         }}
         >
         ANALYZER
