@@ -19,16 +19,16 @@ function SecondPage() {
       width: '100vw',
       overflow: 'hidden',
       backgroundColor: '#F4F9E9',
-      padding: '10px', // Adding main padding here
+      padding: '10px', 
       boxSizing: 'border-box'
     }}>
       <div style={{
         display: 'flex',
         gap: '10px',
-        height: 'calc(100%)', // Account for padding
+        height: 'calc(100%)', 
         width: '100%'
       }}>
-        {/* Left Panel */}
+
         <div style={{
           width: '70%',
           display: 'flex',
@@ -40,7 +40,7 @@ function SecondPage() {
           overflow: 'hidden',
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)'
         }}>
-          {/* CODE Header */}
+
           <div style={{
             backgroundColor: '#153243',
             color: 'white',
@@ -50,7 +50,7 @@ function SecondPage() {
             <div style={{ fontFamily:'heyyy',fontSize: '24px', fontWeight: 'bold' }}>CODE</div>
           </div>
           
-          {/* Language Tabs */}
+
           <div style={{ display: 'flex', width: '100%' }}>
             {languages.map((lang) => (
               <div 
@@ -70,7 +70,7 @@ function SecondPage() {
             ))}
           </div>
           
-          {/* Code Editor */}
+
           <div style={{
             position: 'relative',
             flexGrow: 1,
@@ -95,7 +95,7 @@ function SecondPage() {
               onChange={(e) => setCode(e.target.value)}
             />
             
-            {/* Play Button */}
+           
             <button 
               style={{
                 position: 'absolute',
@@ -127,14 +127,19 @@ function SecondPage() {
           </div>
         </div>
         
-        {/* Right Panel */}
+
+
+
+
+
+
         <div style={{
           width: '30%',
           display: 'flex',
           flexDirection: 'column',
           gap: '10px'
         }}>
-          {/* Graph Representation */}
+         
           <div style={{
             flex: '1',
             display: 'flex',
@@ -159,11 +164,12 @@ function SecondPage() {
               backgroundColor: '#EEF0EB',
               padding: '15px'
             }}>
-              {/* Content for graph would go here */}
+              
             </div>
           </div>
           
-          {/* Time Complexity */}
+
+
           <div style={{
             flex: '1',
             display: 'flex',
