@@ -6,31 +6,30 @@
 #include <regex>
 using namespace std;
 
-struct LoopNode {
+struct LoopNode 
+{
     string loopType;
     string loopHeader;
     string complexity;
     vector<LoopNode*> children;
 };
-
-string getLoopComplexity(const string& header) {
+string getLoopComplexity(const string& header) 
+{
     if (regex_search(header, regex("\\w+\\s*\\*=\\s*\\d+")) ||
         regex_search(header, regex("\\w+\\s*=\\s*\\w+\\s*\\*\\s*\\d+")) ||
         regex_search(header, regex("\\w+\\s*/=\\s*\\d+")) ||
         regex_search(header, regex("\\w+\\s*=\\s*\\w+\\s*/\\s*\\d+"))) {
         return "O(log n)";
     }
-
     if (regex_search(header, regex("\\+\\+") ) ||
         regex_search(header, regex("--") ) ||
         regex_search(header, regex("\\+=\\s*1")) ||
-        regex_search(header, regex("=\\s*\\w+\\s*\\+\\s*1"))) {
+        regex_search(header, regex("=\\s*\\w+\\s*\\+\\s*1"))) 
+        {
         return "O(n)";
     }
-
     return "O(n)"; // Default fallback
 }
-
 void printComplexity(LoopNode* node, int depth = 0) {
     for (int i = 0; i < depth; ++i) cout << "  ";
     cout << node->loopType << " - " << node->complexity << endl;
@@ -72,7 +71,6 @@ int main() {
             }
         }
     )";
-
     stringstream ss(code);
     string line;
     stack<LoopNode*> loopStack;

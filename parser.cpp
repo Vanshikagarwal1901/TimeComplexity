@@ -2,9 +2,7 @@
 #include <fstream>
 #include <string>
 #include <regex>
-
 using namespace std;
-
 void parseCode(const string& inputFile, const string& outputFile) {
     ifstream inFile(inputFile);
     ofstream outFile(outputFile);
