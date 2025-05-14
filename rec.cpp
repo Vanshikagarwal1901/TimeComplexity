@@ -4,8 +4,8 @@
 #include <stack>
 #include <sstream>
 #include <regex>
+#include <fstream>  // Added for file reading
 using namespace std;
-
 struct LoopNode 
 {
     string loopType;
@@ -25,7 +25,7 @@ string getLoopComplexity(const string& header)
         regex_search(header, regex("--") ) ||
         regex_search(header, regex("\\+=\\s*1")) ||
         regex_search(header, regex("=\\s*\\w+\\s*\\+\\s*1"))) 
-        {
+    {
         return "O(n)";
     }
     return "O(n)"; // Default fallback
@@ -40,7 +40,6 @@ void printComplexity(LoopNode* node, int depth = 0) {
 string multiplyComplexities(const string& a, const string& b) {
     if (a == "O(1)") return b;
     if (b == "O(1)") return a;
-
     if ((a == "O(n)" && b == "O(log n)") || (a == "O(log n)" && b == "O(n)"))
         return "O(n log n)";
     if (a == "O(n)" && b == "O(n)")
@@ -61,21 +60,20 @@ string calculateTotalComplexity(LoopNode* node) {
     }
     return total;
 }
-
-int main() {
-    string code = R"(
-     for(int i = 0; i < n; i++) {
-            while(i < n) {
-                for(int j = 1; j < n; j *= 2) {
-                }
-            }
-        }
-    )";
-    stringstream ss(code);
+int main() 
+{
+    string filename = "code.txt"; // The file containing the code
+    ifstream file(filename);  // Open the file
+    if (!file.is_open()) {
+        cerr << "Error: Could not open the file." << endl;
+        return 1;
+    }
+    stringstream ss;
+    ss << file.rdbuf();  // Read the entire file content into stringstream
+    file.close();  // Close the file
     string line;
     stack<LoopNode*> loopStack;
-    vector<LoopNode*> topLevel;
-
+    vector<LoopNode*> topLevel; 
     while (getline(ss, line)) {
         if (line.find("for") != string::npos || line.find("while") != string::npos) {
             LoopNode* node = new LoopNode;
@@ -92,17 +90,10 @@ int main() {
             }
         }
     }
-
-    // Display
-    cout << "Loop Nesting and Complexity:\n";
-    for (auto* node : topLevel) {
-        printComplexity(node);
-    }
-    cout << "\nFinal Time Complexities:\n";
     for (auto* node : topLevel) {
         string final = calculateTotalComplexity(node);
-        cout << "→ Top-level " << node->loopType << ": " << final << endl;
+        cout << final << endl;
     }
-    
+
     return 0;
 }
