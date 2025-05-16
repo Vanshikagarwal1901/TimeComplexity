@@ -1,2 +1,26 @@
-write your code here
+#include <iostream>
+
+void printHelloWorld(int n) {
+    int k = 0;
+    while (k < n) {
+        std::cout << "Hello World" << std::endl;
+        ++k;
+    }
+}
+
+int main() {
+    int n = 10; // You can change n to any value
+    int i = 0;
+    while (i < n) {
+        int j = 0;
+        while (j < n) {
+            // O(n^2) operation
+            std::cout << "(" << i << "," << j << ") ";
+            printHelloWorld(n);
+            ++j;
+        }
+        std::cout << std::endl;
+        ++i;
+    }
+    return 0;
 }
