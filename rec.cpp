@@ -4,7 +4,8 @@
 #include <stack>
 #include <sstream>
 #include <regex>
-#include <fstream>  // Added for file reading
+#include <fstream>
+
 using namespace std;
 struct LoopNode 
 {
@@ -64,10 +65,6 @@ int main()
 {
     string filename = "code.txt"; // The file containing the code
     ifstream file(filename);  // Open the file
-    if (!file.is_open()) {
-        cerr << "Error: Could not open the file." << endl;
-        return 1;
-    }
     stringstream ss;
     ss << file.rdbuf();  // Read the entire file content into stringstream
     file.close();  // Close the file
@@ -90,10 +87,14 @@ int main()
             }
         }
     }
+    string final="hey";
     for (auto* node : topLevel) {
-        string final = calculateTotalComplexity(node);
-        cout << final << endl;
+        final = calculateTotalComplexity(node);
+        cout << final << endl;  
     }
-
+    cout<<final<<endl;
+    ofstream resultFile("result.txt");
+    resultFile << final;
+    resultFile.close();
     return 0;
 }
