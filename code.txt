@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <iostream>
 using namespace std;
 
@@ -13,3 +14,7 @@ int main() {
 
     return 0;
 }
+=======
+write your code here
+}
+>>>>>>> 068983378306bbe107d2dc6fd4d1d49118cc2463
