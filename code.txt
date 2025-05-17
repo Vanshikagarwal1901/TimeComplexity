@@ -1,36 +1,15 @@
 #include <iostream>
-
 using namespace std;
+
 int main() {
+    int n = 16;  // Example size
 
-    int n;
-
-    cout << "Enter a positive integer: ";
-    cin >> n;
-    int i = 1;
-
-    while (i <= n) {
-
-        int j = 1;
-
-        while (j <= n) {
-
-            // Perform some operation
-
-            cout << "(" << i << ", " << j << ") ";
-
-            j *= 2; // Logarithmic growth
-
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j *= 2) {
+            // Some constant time operation
+            cout << i << ", " << j << endl;
         }
-
-        cout << endl;
-
-        i++;
-
     }
 
-
-
     return 0;
-
 }
