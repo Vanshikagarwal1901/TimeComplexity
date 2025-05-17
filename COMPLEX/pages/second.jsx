@@ -1,16 +1,29 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
 function SecondPage() {
   const [code, setCode] = useState(`write your code here
 }`);
 
   const languages = ['C', 'C++', 'Python', 'Java'];
   const [selectedLanguage, setSelectedLanguage] = useState('C');
-
+  const [timeComplexity, setTimeComplexity] = useState(null);
   const handleSubmit = () => {
     console.log("Submitting code:", code);
     console.log("Selected language:", selectedLanguage);
+    axios.post('http://127.0.0.1:8000/analyzer/analyze_code/', {
+      code: code,
+      language: selectedLanguage
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+      console.log('Code submitted successfully:', response.data);
+      setTimeComplexity(response.data.time_complexity);  // Show the time complexity in the UI
+    })
+    .catch(error => {
+      console.error('There was an error submitting the code:', error);
+    });  
   };
 
   return (
