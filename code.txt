@@ -1,26 +1,20 @@
 #include <iostream>
 
-void printHelloWorld(int n) {
-    int k = 0;
-    while (k < n) {
-        std::cout << "Hello World" << std::endl;
-        ++k;
-    }
-}
-
 int main() {
-    int n = 10; // You can change n to any value
-    int i = 0;
-    while (i < n) {
-        int j = 0;
-        while (j < n) {
-            // O(n^2) operation
-            std::cout << "(" << i << "," << j << ") ";
-            printHelloWorld(n);
-            ++j;
+    int n = 1000; // Example input size
+    int count = 0;
+
+    int i = 1;
+    while (i <= n) {
+        int j = 1;
+        while (j <= n) {
+            // Constant time operation
+            count++;
+            j *= 2; // Logarithmic growth
         }
-        std::cout << std::endl;
-        ++i;
+        i++; // Linear growth
     }
+
+    std::cout << "Total operations: " << count << std::endl;
     return 0;
 }

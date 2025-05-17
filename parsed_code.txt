@@ -1,14 +1,7 @@
-void printHelloWorld(int n) {
-while (k < n) {
-++k;
-}
-}
 int main() {
-while (i < n) {
-int j = 0;
-while (j < n) {
-printHelloWorld(n);
-++j;
+while (i <= n) {
+int j = 1;
+while (j <= n) {
 }
 }
 }
