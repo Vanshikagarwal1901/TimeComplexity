@@ -332,7 +332,7 @@ void parseAndWriteCode(const string& inputFile, const string& outputFile) {
 
 string extractFunctionName(const string& line) {
     smatch match;
-    regex funcPattern(R"((?:\w+[\s*&]+)+(\w+)\s*\([^\)]*\)\s*\{)");
+    regex funcPattern(R"((?:\w+[\s*&]+)+(\w+)\s*\([^\)]\)\s\{)");
     if (regex_search(line, match, funcPattern)) {
         return match[1];
     }
@@ -561,13 +561,13 @@ void analyzeParsedCode(const string& parsedFile) {
 
         int maxDepth = 0;
         int logCount = 0;
-        for (const auto& loop : finfo.loops) {
+        for (const auto& loop : finfo.loops) 
+        {
             maxDepth = max(maxDepth, loop.depth + 1);
-            if (loop.operation == "log" || regex_search(loop.operation, regex(R"([*/]=|/|\*=)"))) {
+            if (loop.operation == "log" || regex_search(loop.operation, regex(R"([/]=|/|\=)"))) {
                 logCount++;
             }
         }
-
         if (finfo.isRecursive) {
             anyRecursion = true;
             cout << "Recursive Function Detected: " << fname << "()\n";
@@ -602,13 +602,12 @@ void analyzeParsedCode(const string& parsedFile) {
         cout << "\nNo recursive functions detected.\n";
     }
 }
-
 int main() {
     string inputFile = "code.txt";
     string parsedFile = "parsed_code.txt";
-
     parseAndWriteCode(inputFile, parsedFile);
     analyzeParsedCode(parsedFile);
 
     return 0;
+
 }
