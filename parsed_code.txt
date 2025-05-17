@@ -1,3 +1,12 @@
 int main() {
+<<<<<<< HEAD
     while (i <= n) {
         while (j <= n) {
+=======
+while (i <= n) {
+int j = 1;
+while (j <= n) {
+}
+}
+}
+>>>>>>> bbfedd86fb37a271113245ce87108b27a6a4f627

@@ -1,3 +1,26 @@
+<<<<<<< HEAD
 jhgfdfghjmdfsfghmnbvcnjuytyty
 ikljhfghj
 yuilkyh
+=======
+#include <iostream>
+
+int main() {
+    int n = 1000; // Example input size
+    int count = 0;
+
+    int i = 1;
+    while (i <= n) {
+        int j = 1;
+        while (j <= n) {
+            // Constant time operation
+            count++;
+            j *= 2; // Logarithmic growth
+        }
+        i++; // Linear growth
+    }
+
+    std::cout << "Total operations: " << count << std::endl;
+    return 0;
+}
+>>>>>>> bbfedd86fb37a271113245ce87108b27a6a4f627
