@@ -1,20 +1,165 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+using namespace std;
 
-int main() {
-    int n = 1000; // Example input size
-    int count = 0;
+// O(n) - Linear time complexity
+int linearSum(int n) {
+    int sum = 0;
+    for(int i = 1; i <= n; i++) {
+        sum += i;
+    }
+    return sum;
+}
 
-    int i = 1;
-    while (i <= n) {
-        int j = 1;
-        while (j <= n) {
-            // Constant time operation
-            count++;
-            j *= 2; // Logarithmic growth
+// O(log n) - Logarithmic time complexity (Binary Search)
+int binarySearch(int arr[], int size, int target) {
+    int low = 0, high = size - 1;
+    while(low <= high) {
+        int mid = low + (high - low) / 2;
+        if(arr[mid] == target) {
+            return mid;
         }
-        i++; // Linear growth
+        if(arr[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+    return -1;
+}
+
+// O(n log n) - Linearithmic time complexity (Iterative Merge Sort)
+void merge(int arr[], int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    vector<int> L(n1), R(n2);
+
+    for(int i = 0; i < n1; i++) {
+        L[i] = arr[l + i];
+    }
+    for(int j = 0; j < n2; j++) {
+        R[j] = arr[m + 1 + j];
     }
 
-    std::cout << "Total operations: " << count << std::endl;
+    int i = 0, j = 0, k = l;
+    while(i < n1 && j < n2) {
+        if(L[i] <= R[j]) {
+            arr[k++] = L[i++];
+        } else {
+            arr[k++] = R[j++];
+        }
+    }
+    while(i < n1) {
+        arr[k++] = L[i++];
+    }
+    while(j < n2) {
+        arr[k++] = R[j++];
+    }
+}
+
+void iterativeMergeSort(int arr[], int n) {
+    for(int curr_size = 1; curr_size <= n; curr_size *= 2) {
+        for(int left = 0; left < n; left += 2*curr_size) {
+            int mid = min(left + curr_size - 1, n-1);
+            int right = min(left + 2*curr_size - 1, n-1);
+            merge(arr, left, mid, right);
+        }
+    }
+}
+
+// O(n²) - Quadratic time complexity (Selection Sort)
+void selectionSort(int arr[], int n) {
+    for(int i = 0; i < n-1; i++) {
+        int min_idx = i;
+        for(int j = i+1; j < n; j++) {
+            if(arr[j] < arr[min_idx]) {
+                min_idx = j;
+            }
+        }
+        swap(arr[min_idx], arr[i]);
+    }
+}
+
+// O(2ⁿ) - Exponential time complexity (All subsets of a set)
+void generateSubsets(vector<int>& nums) {
+    int n = nums.size();
+    for(int i = 0; i < (1 << n); i++) {
+        cout << "{ ";
+        for(int j = 0; j < n; j++) {
+            if(i & (1 << j)) {
+                cout << nums[j] << " ";
+            }
+        }
+        cout << "}" << endl;
+    }
+}
+
+// O(n!) - Factorial time complexity (Permutations using Heap's algorithm)
+void generatePermutations(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> c(n, 0);
+    
+    // Output first permutation
+    for(int num : nums) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    int i = 0;
+    while(i < n) {
+        if(c[i] < i) {
+            swap(nums[i % 2 == 0 ? 0 : c[i]], nums[i]);
+            for(int num : nums) {
+                cout << num << " ";
+            }
+            cout << endl;
+            c[i]++;
+            i = 0;
+        } else {
+            c[i] = 0;
+            i++;
+        }
+    }
+}
+
+int main() {
+    // O(n) example
+    cout << "Linear sum (O(n)): " << linearSum(5) << endl;
+
+    // O(log n) example
+    int sorted_arr[] = {1, 3, 5, 7, 9};
+    cout << "Binary search (O(log n)): " 
+         << binarySearch(sorted_arr, 5, 5) << endl;
+
+    // O(n log n) example
+    int merge_arr[] = {12, 11, 13, 5, 6};
+    iterativeMergeSort(merge_arr, 5);
+    cout << "Iterative merge sort (O(n log n)): ";
+    for(int num : merge_arr) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    // O(n²) example
+    int select_arr[] = {5, 1, 4, 2, 8};
+    selectionSort(select_arr, 5);
+    cout << "Selection sort (O(n²)): ";
+    for(int num : select_arr) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    // O(2ⁿ) example
+    vector<int> nums = {1, 2, 3};
+    cout << "All subsets (O(2ⁿ)):\n";
+    generateSubsets(nums);
+
+    // O(n!) example
+    vector<int> perm_nums = {1, 2, 3};
+    cout << "All permutations (O(n!)):\n";
+    generatePermutations(perm_nums);
+
     return 0;
 }

@@ -35,18 +35,76 @@ struct FunctionInfo {
 
 unordered_map<string, FunctionInfo> functions;
 
+// Global variable to keep the maximum complexity level:
+// We'll represent complexity levels using an integer scale:
+// 0 -> O(1)
+// 1 -> O(log n)
+// 2 -> O(n)
+// 3 -> O(n log n)
+// 4 -> O(n^2)
+// 5 -> O(n^k) for k>2 (general polynomial)
+// 6 -> O(n^maxDepth * log n)
+// 7 -> Recursive or other higher complexities
+
+int maxComplexityLevel = 0;
+
+// Helper function to convert complexity string to the above scale
+int complexityToLevel(const string& complexityStr) {
+    if (complexityStr == "O(1)") return 0;
+    if (complexityStr == "O(log n)") return 1;
+    if (complexityStr == "O(n)") return 2;
+    if (complexityStr == "O(n log n)") return 3;
+    if (complexityStr == "O(n^2)") return 4;
+    if (complexityStr == "O(n^k) for k > 2") return 5; 
+    if (complexityStr == "O(n^k * log n)") return 6; 
+    if (complexityStr == "O(n) or worse (recursive or complex)") return 7; 
+    // For polynomial complexities, try to parse powers
+    regex polyRegex(R"(O\(n\^(\d+)( \* log n)?\))");
+    smatch match;
+    if (regex_match(complexityStr, match, polyRegex)) {
+        int power = stoi(match[1]);
+        if (match[2].matched) {
+            // If has '* log n' part, assign level 6 (some complex)
+            return 6;
+        }
+        if (power == 1) return 2;
+        if (power == 2) return 4;
+        if (power > 2) return 5;
+    }
+    // For complexities like "O(n^maxDepth * log n)" or unknown, use level 6 or 7
+    if (complexityStr.find("log n") != string::npos) {
+        return 6;
+    }
+    return 7; // unknown or recursive worse complexities
+}
+
+// Helper function to convert level back to readable string (approximate)
+string levelToComplexity(int level) {
+    switch (level) {
+        case 0: return "O(1)";
+        case 1: return "O(log n)";
+        case 2: return "O(n)";
+        case 3: return "O(n log n)";
+        case 4: return "O(n^2)";
+        case 5: return "O(n^k) for k > 2";
+        case 6: return "O(n^k * log n)";
+        case 7: return "O(n) or worse (recursive or complex)";
+        default: return "Unknown Complexity";
+    }
+}
+
 // Trim function implementation
 string trim(const string& str) {
     auto start = str.begin();
     while (start != str.end() && std::isspace(*start)) {
         ++start;
     }
-    
+
     auto end = str.end();
     do {
         --end;
     } while (end != start && std::isspace(*end));
-    
+
     return string(start, end + 1);
 }
 
@@ -90,22 +148,22 @@ void removeComments(string& line, bool& inBlockComment) {
 string extractWhileVar(const string& line) {
     size_t whilePos = line.find("while");
     if (whilePos == string::npos) return "";
-    
+
     size_t openParen = line.find('(', whilePos);
     if (openParen == string::npos) return "";
-    
+
     size_t closeParen = line.find(')', openParen);
     if (closeParen == string::npos) return "";
-    
+
     string condition = line.substr(openParen + 1, closeParen - openParen - 1);
-    
+
     // Find first valid variable name in condition
     size_t varStart = condition.find_first_not_of(" (&|!=");
     if (varStart == string::npos) return "";
-    
+
     size_t varEnd = condition.find_first_of(" )&|!=<", varStart);
     if (varEnd == string::npos) varEnd = condition.length();
-    
+
     string var = condition.substr(varStart, varEnd - varStart);
     return var;
 }
@@ -113,28 +171,28 @@ string extractWhileVar(const string& line) {
 // Check if line updates a variable
 bool updatesVariable(const string& line, const string& var) {
     if (var.empty()) return false;
-    
+
     // Check for var++ or var--
-    if (line.find(var + "++") != string::npos || 
+    if (line.find(var + "++") != string::npos ||
         line.find(var + "--") != string::npos) {
         return true;
     }
-    
+
     // Check for ++var or --var
-    if (line.find("++" + var) != string::npos || 
+    if (line.find("++" + var) != string::npos ||
         line.find("--" + var) != string::npos) {
         return true;
     }
-    
+
     // Check for var = ... or var +=, var -= etc.
     size_t assignPos = line.find(var);
     while (assignPos != string::npos) {
         // Check if this is actually our variable (not part of another word)
         bool isWholeWord = true;
         if (assignPos > 0 && isalnum(line[assignPos - 1])) isWholeWord = false;
-        if (assignPos + var.length() < line.length() && 
+        if (assignPos + var.length() < line.length() &&
             isalnum(line[assignPos + var.length()])) isWholeWord = false;
-            
+
         if (isWholeWord) {
             size_t opPos = line.find_first_of("=+-*/%&|^", assignPos + var.length());
             if (opPos != string::npos && line[opPos] == '=') {
@@ -143,7 +201,7 @@ bool updatesVariable(const string& line, const string& var) {
         }
         assignPos = line.find(var, assignPos + 1);
     }
-    
+
     return false;
 }
 
@@ -153,7 +211,7 @@ bool containsFunctionCall(const string& line, const vector<string>& functions) {
         size_t callPos = line.find(func + "(");
         if (callPos != string::npos) {
             // Check if it's really a function call and not a declaration
-            if (line.find(';', callPos) != string::npos || 
+            if (line.find(';', callPos) != string::npos ||
                 line.find('}', callPos) != string::npos) {
                 return true;
             }
@@ -164,7 +222,7 @@ bool containsFunctionCall(const string& line, const vector<string>& functions) {
 
 // Check if line starts a loop
 bool isLoopStart(const string& line) {
-    return line.find("for(") != string::npos || 
+    return line.find("for(") != string::npos ||
            line.find("while(") != string::npos ||
            line.find("for (") != string::npos ||
            line.find("while (") != string::npos;
@@ -172,7 +230,7 @@ bool isLoopStart(const string& line) {
 
 // Check if line is a conditional statement
 bool isConditional(const string& line) {
-    return line.find("if(") != string::npos || 
+    return line.find("if(") != string::npos ||
            line.find("if (") != string::npos ||
            line.find("else if(") != string::npos ||
            line.find("else if (") != string::npos ||
@@ -186,17 +244,17 @@ bool isFunctionStart(const string& line, string& funcName) {
     size_t openParen = line.find('(');
     size_t closeParen = line.find(')');
     size_t openBrace = line.find('{');
-    
+
     if (openParen == string::npos || closeParen == string::npos || openBrace == string::npos)
         return false;
     if (openParen >= closeParen || closeParen >= openBrace)
         return false;
-    
+
     // Extract function name
     size_t nameStart = line.substr(0, openParen).find_last_of(" *&");
     if (nameStart == string::npos) nameStart = 0;
     else nameStart++;
-    
+
     funcName = line.substr(nameStart, openParen - nameStart);
     return !funcName.empty();
 }
@@ -240,7 +298,7 @@ void parseAndWriteCode(const string& inputFile, const string& outputFile) {
                         bool hasUpdates = false;
                         bool hasFunctionCalls = false;
                         bool hasConditionals = false;
-                        
+
                         for (const string& bodyLine : loopBodyLines) {
                             if (!loopVar.empty() && updatesVariable(bodyLine, loopVar)) {
                                 hasUpdates = true;
@@ -255,7 +313,7 @@ void parseAndWriteCode(const string& inputFile, const string& outputFile) {
                                 hasFunctionCalls = true;
                             }
                         }
-                        
+
                         if (hasUpdates || hasFunctionCalls || hasConditionals) {
                             outFile << loopBodyLines.front() << endl;
                             for (size_t i = 1; i < loopBodyLines.size(); i++) {
@@ -269,7 +327,7 @@ void parseAndWriteCode(const string& inputFile, const string& outputFile) {
                                 }
                             }
                         }
-                        
+
                         loopBodyLines.clear();
                         currentLoopVars.pop_back();
                         inLoopBody.pop_back();
@@ -438,7 +496,7 @@ RecursionInfo analyzeRecursionPattern(const string& functionName, const vector<s
     for (const auto& line : bodyLines) {
         if (line.find(functionName + "(") != string::npos) {
             info.recursiveCall = line;
-            
+
             // Check tail recursion
             if (line.find("return " + functionName + "(") != string::npos) {
                 info.isTailRecursive = true;
@@ -571,7 +629,7 @@ void analyzeParsedCode(const string& parsedFile) {
         if (finfo.isRecursive) {
             anyRecursion = true;
             cout << "Recursive Function Detected: " << fname << "()\n";
-            
+
             cout << "--- Recursion Analysis ---\n";
             if (!finfo.recursionInfo.baseCaseCondition.empty()) {
                 cout << "Base case: " << finfo.recursionInfo.baseCaseCondition << "\n";
@@ -581,26 +639,42 @@ void analyzeParsedCode(const string& parsedFile) {
             }
             cout << "Problem reduction factor: " << finfo.recursionInfo.problemReductionFactor << "\n";
             cout << "Tail recursive: " << (finfo.recursionInfo.isTailRecursive ? "Yes" : "No") << "\n";
-            
+
             cout << "--- Time Complexity Estimation ---\n";
-            cout << "Estimated Complexity: " << estimateRecursionComplexity(finfo.recursionInfo) << "\n";
+            string complexityStr = estimateRecursionComplexity(finfo.recursionInfo);
+            cout << "Estimated Complexity: " << complexityStr << "\n";
+
+            // Update global max complexity level
+            int level = complexityToLevel(complexityStr);
+            if (level > maxComplexityLevel) maxComplexityLevel = level;
+
             continue;
         }
 
         cout << "--- Time Complexity Estimation ---\n";
+        string complexityStr;
         if (logCount > 0 && maxDepth == 1)
-            cout << "Estimated Complexity: O(log n)\n";
+            complexityStr = "O(log n)";
         else if (logCount > 0 && maxDepth > 1)
-            cout << "Estimated Complexity: O(n^" << maxDepth - logCount << " * log n)\n";
+            complexityStr = "O(n^" + to_string(maxDepth - logCount) + " * log n)";
         else if (maxDepth > 0)
-            cout << "Estimated Complexity: O(n^" << maxDepth << ")\n";
+            complexityStr = "O(n^" + to_string(maxDepth) + ")";
         else
-            cout << "Estimated Complexity: O(1)\n";
+            complexityStr = "O(1)";
+        cout << "Estimated Complexity: " << complexityStr << "\n";
+
+        // Update global max complexity level
+        int level = complexityToLevel(complexityStr);
+        if (level > maxComplexityLevel) maxComplexityLevel = level;
     }
 
     if (!anyRecursion) {
         cout << "\nNo recursive functions detected.\n";
     }
+
+    // Print global maximum complexity
+    cout << "\n=== Maximum Complexity among all functions ===\n";
+    cout << "Maximum Estimated Complexity: " << levelToComplexity(maxComplexityLevel) << "\n";
 }
 
 int main() {
