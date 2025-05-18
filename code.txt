@@ -1,20 +1,19 @@
-<<<<<<< HEAD
 #include <iostream>
 using namespace std;
 
-int main() {
-    int n = 16;  // Example size
-
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j *= 2) {
-            // Some constant time operation
-            cout << i << ", " << j << endl;
+void findTriplets(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                cout << "(" << arr[i] << ", " << arr[j] << ", " << arr[k] << ")\n";
+            }
         }
     }
+}
 
-    return 0;
-}
-=======
-write your code here
-}
->>>>>>> 068983378306bbe107d2dc6fd4d1d49118cc2463
+int main() {
+    int arr[] = {1, 2, 3, 4};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    cout << "All possible triplets:\n";
+    findTriplets(arr, n);
