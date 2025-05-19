@@ -41,26 +41,6 @@ if(arr[j] < arr[min_idx]) {
 }
 }
 }
-void generateSubsets(vector<int>& nums) {
-for(int i = 0; i < (1 << n); i++) {
-for(int j = 0; j < n; j++) {
-if(i & (1 << j)) {
-}
-}
-cout << "}" << endl;
-}
-}
-void generatePermutations(vector<int>& nums) {
-for(int num : nums) {
-}
-while(i < n) {
-if(c[i] < i) {
-for(int num : nums) {
-}
-} else {
-}
-}
-}
 int main() {
 cout << "Linear sum (O(n)): " << linearSum(5) << endl;
 int sorted_arr[] = {1, 3, 5, 7, 9};
@@ -74,7 +54,5 @@ selectionSort(select_arr, 5);
 for(int num : select_arr) {
 }
 vector<int> nums = {1, 2, 3};
-generateSubsets(nums);
 vector<int> perm_nums = {1, 2, 3};
-generatePermutations(perm_nums);
 }
