@@ -1,16 +1,121 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
 import axios from 'axios';
-function SecondPage() {
-  const [code, setCode] = useState(`write your code here
-}`);
 
-  const languages = ['C', 'C++', 'Python', 'Java'];
-  const [selectedLanguage, setSelectedLanguage] = useState('C');
+const sampleCode = `using System;
+
+public class Demo
+{
+    public static void Main()
+    {
+        int n = 100;
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                Console.WriteLine(i + j);
+            }
+        }
+
+        while (n > 1)
+        {
+            n /= 2;
+        }
+    }
+}`;
+
+const complexityScale = ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)', 'O(n^2)', 'O(n^3)', 'higher'];
+
+function ComplexityGraph({ nodes }) {
+  const graphNodes = nodes?.length ? nodes : [{ Label: 'result', Complexity: 'O(1)', Level: 0, Depth: 0 }];
+  const maxLevel = 6;
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'stretch', gap: '10px', minHeight: 0 }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column-reverse',
+          justifyContent: 'space-between',
+          color: '#153243',
+          fontSize: '11px',
+          width: '64px',
+          textAlign: 'right',
+          paddingBottom: '20px'
+        }}>
+          {complexityScale.map(label => <span key={label}>{label}</span>)}
+        </div>
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: '12px',
+          borderLeft: '2px solid #153243',
+          borderBottom: '2px solid #153243',
+          padding: '10px 10px 20px',
+          minWidth: 0
+        }}>
+          {graphNodes.map((node, index) => {
+            const level = Math.max(0, Math.min(maxLevel, node.Level ?? 0));
+            const height = `${Math.max(10, ((level + 1) / (maxLevel + 1)) * 100)}%`;
+            return (
+              <div key={`${node.Label}-${index}`} style={{
+                flex: '1 1 0',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                minWidth: '38px'
+              }}>
+                <div title={`${node.Label}: ${node.Complexity}`} style={{
+                  width: '100%',
+                  maxWidth: '48px',
+                  height,
+                  background: '#2c4453',
+                  borderRadius: '6px 6px 0 0',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)'
+                }} />
+                <span style={{
+                  marginTop: '6px',
+                  color: '#153243',
+                  fontSize: '11px',
+                  maxWidth: '64px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {node.Label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SecondPage() {
+  const [code, setCode] = useState(sampleCode);
+
+  const languages = ['C#'];
+  const [selectedLanguage, setSelectedLanguage] = useState('C#');
   const [timeComplexity, setTimeComplexity] = useState(null);
+  const [nodes, setNodes] = useState([]);
+  const [explanation, setExplanation] = useState([]);
+  const [error, setError] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const resultText = useMemo(() => {
+    if (isAnalyzing) return 'Analyzing...';
+    if (error) return error;
+    return timeComplexity ?? 'Run the analyzer';
+  }, [error, isAnalyzing, timeComplexity]);
+
   const handleSubmit = () => {
-    console.log("Submitting code:", code);
-    console.log("Selected language:", selectedLanguage);
+    setIsAnalyzing(true);
+    setError(null);
     axios.post('http://127.0.0.1:8000/analyzer/analyze_code/', {
       code: code,
       language: selectedLanguage
@@ -18,12 +123,17 @@ function SecondPage() {
       headers: { 'Content-Type': 'application/json' }
     })
     .then(response => {
-      console.log('Code submitted successfully:', response.data);
-      setTimeComplexity(response.data.time_complexity);  // Show the time complexity in the UI
+      setTimeComplexity(response.data.time_complexity);
+      setNodes(response.data.nodes ?? []);
+      setExplanation(response.data.explanation ?? []);
     })
     .catch(error => {
-      console.error('There was an error submitting the code:', error);
-    });  
+      setTimeComplexity(null);
+      setNodes([]);
+      setExplanation([]);
+      setError(error.response?.data?.error ?? 'Could not reach the analyzer');
+    })
+    .finally(() => setIsAnalyzing(false));
   };
 
   return (
@@ -175,9 +285,10 @@ function SecondPage() {
             <div style={{
               flexGrow: 1,
               backgroundColor: '#EEF0EB',
-              padding: '15px'
+              padding: '15px',
+              minHeight: 0
             }}>
-              
+              <ComplexityGraph nodes={nodes} />
             </div>
           </div>
           
@@ -207,10 +318,32 @@ function SecondPage() {
               backgroundColor: '#EEF0EB',
               padding: '15px',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              gap: '12px',
+              color: '#153243'
             }}>
-              <p style={{ fontSize: '18px' }}></p>
+              <p style={{
+                fontSize: error ? '16px' : '34px',
+                fontWeight: 'bold',
+                margin: 0,
+                color: error ? '#9b1c31' : '#153243'
+              }}>
+                {resultText}
+              </p>
+              <div style={{
+                width: '100%',
+                maxHeight: '110px',
+                overflow: 'auto',
+                textAlign: 'left',
+                fontSize: '12px',
+                lineHeight: 1.45
+              }}>
+                {explanation.slice(0, 4).map((line, index) => (
+                  <p key={index} style={{ margin: '0 0 6px' }}>{line}</p>
+                ))}
+              </div>
             </div>
           </div>
         </div>

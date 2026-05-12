@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "hD7+p8HhY5w=",
+  "success": true,
+  "projectFilePath": "/Users/Abhinav/Documents/GitHub/TimeComplexity/analyzer-csharp/ComplexityAnalyzer/ComplexityAnalyzer.csproj",
+  "expectedPackageFiles": [
+    "/Users/Abhinav/.nuget/packages/microsoft.codeanalysis.analyzers/3.3.4/microsoft.codeanalysis.analyzers.3.3.4.nupkg.sha512",
+    "/Users/Abhinav/.nuget/packages/microsoft.codeanalysis.common/4.11.0/microsoft.codeanalysis.common.4.11.0.nupkg.sha512",
+    "/Users/Abhinav/.nuget/packages/microsoft.codeanalysis.csharp/4.11.0/microsoft.codeanalysis.csharp.4.11.0.nupkg.sha512",
+    "/Users/Abhinav/.nuget/packages/system.collections.immutable/8.0.0/system.collections.immutable.8.0.0.nupkg.sha512",
+    "/Users/Abhinav/.nuget/packages/system.reflection.metadata/8.0.0/system.reflection.metadata.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
